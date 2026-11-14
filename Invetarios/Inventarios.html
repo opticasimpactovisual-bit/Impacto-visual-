@@ -1,101 +1,134 @@
 <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="Inventarios.css?v=5">
+</head>
+<body>
 
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Inventarios</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="Inventarios.css?v=3">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <a href="http://localhost:5001/" class="volver-inicio">&larr; Volver al inicio</a>
-        <img src="./Imagenes/Logo%20de%20impacto.png" alt="Logo de Optica Impacto visual" width="200" height="100">
-        <h1>Optica Impacto visual</h1>
-        <h2>NIT 1121207872-6</h2>
+<a href="http://localhost:5001/" class="volver-inicio">&larr; Volver al inicio</a>
 
-        <h1>Inventarios</h1>
-        <p>Bienvenido al inventario de la Optica impacto visual, aqui podras encontrar todos los productos que tenemos disponibles para la venta, asi como tambien podras ver el stock de cada uno de ellos.</p>
+<main class="hoja">
 
-        <label for="ubicacion">Ubicacion del producto
-        <input type="text" id="ubicacion" placeholder="Ubicación del producto">
-        </label>
-        <label for="Referencia">Referencia
-        <input type="text" id="Referencia" placeholder="Referencia">
-        </label>
-        <label for="FechaIngreso">Fecha de ingreso
-        <input type="date" id="FechaIngreso" title="Fecha_ingreso" placeholder="Fecha de ingreso del producto">
-        </label>
-        <label for="cantidad">Cantidad
-        <input type="number" id="cantidad" placeholder="Cantidad del producto">
-        </label>
-        <label for="ValorCosto">Valor unitario del producto
-        <input type="text" id="ValorCosto" placeholder="Valor unitario del producto">
-        </label>
-        <label for="ValorCliente">Valor total de producto
-        <input type="text" id="ValorCliente" placeholder="Valor total del producto">
-        </label>
-        <label for="listaMaterial">Material
-        <input list="listaMaterial" id="Material" placeholder="Material del producto">
-        <datalist id="listaMaterial">
-            <option value="Plástico"></option>
-            <option value="Plastico al aire"></option>
-            <option value="Acetato"></option>
-            <option value="Acetato al aire"></option>
-            <option value="metalica al aire"></option>
-            <option value="TR 90 al aire"></option>
-            <option value="TR 90 con sobre puesto"></option>
-            <option value="Deportiva"></option>
-            <option value="TR 90"></option>
-            <option value="Metalica"></option>
-            <option value="Seguridad con banda"></option>
-        </datalist>
-        </label>
-        <label for="listaForma">Forma del producto
-        <input list="listaForma" id="Forma" placeholder="Forma del producto">
-        <datalist id="listaForma">
-            <option value="Redonda"></option>
-            <option value="Cuadrada"></option>
-            <option value="Rectangular"></option>
-            <option value="Agatada"></option>
-            <option value="Ovalada"></option>
-        </datalist>
-        </label>
-        <label for="listaEstadoMontura">Estado de la montura
-        <input list="listaEstadoMontura" id="EstadoMontura" placeholder="Estado de la montura">
-        <datalist id="listaEstadoMontura">
-            <option value="Nueva"></option>
-            <option value="Usada"></option>
-        </datalist>
-        </label>
-        <label for="Marca">Marca del prducto
-        <input type="text" id="Marca" placeholder="Marca del producto">
-        </label>    
-        <label for="listaEsReplic">Replica
-        <input list="listaEsReplica" id="EsReplica" placeholder="Es replica">
-        <datalist id="listaEsReplica">
-            <option value="Si"></option>
-            <option value="No"></option>
-        </datalist>
-        </label>
-        <label for="NombreReplica">Marca de la replicar
-        <input type="text" id="NombreReplica" placeholder="Marca de la replica">
-        </label>
-        <label for="Color">Color
-        <input type="text" id="Color" placeholder="Color del producto">
-        </label>
-        
-        
-
-        <div class="botones">
-            <button id="agregar">Agregar producto</button>
-            <button id="cancelar" class="btn-secundario" hidden>Cancelar edición</button>
+    <!-- Encabezado: datos del negocio a la izquierda, título a la derecha -->
+    <header class="encabezado">
+        <div class="negocio">
+            <img src="Imagenes/Logo%20de%20impacto.png" alt="Optica Impacto Visual" class="logo">
+            <h1>Optica Impacto Visual</h1>
+            <h2>Nit: 1121207872-6 Regimen Simplificado</h2>
+            <p>Accesorios - Monturas - Lentes - Despacho de Fórmulas Carrera 19 C No 22 - 10 Sur Telefono 2722839 Celular 3122823660 Barrio Olaya Bogota DC</p>
         </div>
-        <p id="mensaje" class="mensaje" role="status"></p>
+        <div class="documento">
+            <span class="regimen">Control de existencias</span>
+            <h3>Inventario de monturas</h3>
+            <div class="datos-factura">
+                <label for="FechaIngreso">Fecha de ingreso</label>
+                <input type="date" id="FechaIngreso" title="Fecha de ingreso del producto">
+            </div>
+        </div>
+    </header>
 
-        <h1>Monturas registradas</h1>
+    <div class="franja"></div>
+
+    <!-- Datos del producto -->
+    <section>
+        <p class="titulo">Producto</p>
+        <div class="campos">
+            <label for="Referencia">Referencia</label>
+            <input type="text" id="Referencia" placeholder="Referencia de la montura">
+
+            <label for="ubicacion">Ubicación</label>
+            <input type="text" id="ubicacion" placeholder="Dónde está guardada">
+
+            <label for="Marca">Marca</label>
+            <input type="text" id="Marca" placeholder="Marca del producto">
+
+            <label for="Color">Color</label>
+            <input type="text" id="Color" placeholder="Color del producto">
+
+            <label for="cantidad">Cantidad</label>
+            <input type="number" id="cantidad" min="0" placeholder="Unidades" class="numero-campo">
+        </div>
+    </section>
+
+    <!-- Valores -->
+    <section>
+        <p class="titulo">Valores</p>
+        <div class="valores">
+            <div class="valor">
+                <label for="ValorCosto">Valor costo (unitario)</label>
+                <div class="pesos"><span>$</span><input type="text" id="ValorCosto" inputmode="numeric" placeholder="0"><span>COP</span></div>
+            </div>
+            <div class="valor destacado">
+                <label for="ValorCliente">Valor al cliente</label>
+                <div class="pesos"><span>$</span><input type="text" id="ValorCliente" inputmode="numeric" placeholder="0"><span>COP</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características de la montura -->
+    <section>
+        <p class="titulo">Características</p>
+        <div class="campos">
+            <label for="Material">Material</label>
+            <input list="listaMaterial" id="Material" placeholder="Seleccione o escriba">
+            <datalist id="listaMaterial">
+                <option value="Plástico"></option>
+                <option value="Plastico al aire"></option>
+                <option value="Acetato"></option>
+                <option value="Acetato al aire"></option>
+                <option value="metalica al aire"></option>
+                <option value="TR 90 al aire"></option>
+                <option value="TR 90 con sobre puesto"></option>
+                <option value="Deportiva"></option>
+                <option value="TR 90"></option>
+                <option value="Metalica"></option>
+                <option value="Seguridad con banda"></option>
+            </datalist>
+
+            <label for="Forma">Forma</label>
+            <input list="listaForma" id="Forma" placeholder="Seleccione o escriba">
+            <datalist id="listaForma">
+                <option value="Redonda"></option>
+                <option value="Cuadrada"></option>
+                <option value="Rectangular"></option>
+                <option value="Agatada"></option>
+                <option value="Ovalada"></option>
+            </datalist>
+
+            <label for="EstadoMontura">Estado</label>
+            <input list="listaEstadoMontura" id="EstadoMontura" placeholder="Nueva o usada">
+            <datalist id="listaEstadoMontura">
+                <option value="Nueva"></option>
+                <option value="Usada"></option>
+            </datalist>
+
+            <label for="EsReplica">Réplica</label>
+            <input list="listaEsReplica" id="EsReplica" placeholder="Si o No">
+            <datalist id="listaEsReplica">
+                <option value="Si"></option>
+                <option value="No"></option>
+            </datalist>
+
+            <label for="NombreReplica">Marca de la réplica</label>
+            <input type="text" id="NombreReplica" placeholder="Solo si es réplica">
+        </div>
+    </section>
+
+    <div class="botones">
+        <button type="button" id="agregar" class="boton-principal">Agregar producto</button>
+        <button type="button" id="cancelar" class="boton-secundario" hidden>Cancelar edición</button>
+        <p id="mensaje" class="mensaje" role="status"></p>
+    </div>
+
+    <!-- Monturas guardadas -->
+    <section>
+        <p class="titulo">Monturas registradas</p>
         <div class="tabla-contenedor">
             <table>
                 <thead>
@@ -107,16 +140,19 @@
                         <th>Forma</th>
                         <th>Color</th>
                         <th>Estado</th>
-                        <th>Cantidad</th>
-                        <th>Costo</th>
-                        <th>Cliente</th>
+                        <th class="numero">Cant.</th>
+                        <th class="numero">Costo</th>
+                        <th class="numero">Cliente</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody id="tablaMonturas"></tbody>
             </table>
         </div>
+    </section>
 
-        <script src="Inventarios.js?v=3" defer></script>
-    </body>
+</main>
+
+<script src="Inventarios.js?v=3" defer></script>
+</body>
 </html>
