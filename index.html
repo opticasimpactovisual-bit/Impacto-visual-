@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optica Impacto Visual · Panel principal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    /* Mismos colores y letras de Facturacion.css */
+    :root {
+      --fondo: #e3ecf7;
+      --papel: #ffffff;
+      --tinta: #1b2a3d;
+      --gris: #5d6b7e;
+      --linea: #d3deeb;
+      --principal: #1f5fa8;
+      --principal-oscuro: #174c87;
+      --azul: #3b8fd9;
+      --suave: #edf3fb;
+      --letra-titulo: "Nunito", "Trebuchet MS", sans-serif;
+      --letra-texto: "Source Sans 3", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 28px 16px 48px;
+      background: var(--fondo);
+      color: var(--tinta);
+      font-family: var(--letra-texto);
+      font-size: 14px;
+    }
+
+    /* La hoja blanca, igual que en Facturación */
+    .hoja {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--papel);
+      border-radius: 6px;
+      padding: 36px 40px 32px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 12px 32px rgba(20, 40, 70, .14);
+      display: grid;
+      gap: 22px;
+    }
+
+    /* ---------- Encabezado ---------- */
+    .encabezado {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+    }
+    .logo { width: 100%; max-width: 330px; height: auto; display: block; }
+    .negocio h1 {
+      margin: 10px 0 0;
+      font-family: var(--letra-titulo);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--principal);
+    }
+    .negocio h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--gris); }
+    .negocio p  { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: var(--gris); max-width: 46ch; }
+
+    .documento { display: grid; justify-items: end; gap: 6px; text-align: right; }
+    .etiqueta {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--azul);
+    }
+    .documento h3 {
+      margin: 0;
+      font-family: var(--letra-titulo);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--principal);
+    }
+    .reloj { font-size: 13px; color: var(--gris); }
+    .reloj strong { display: block; font-size: 20px; color: var(--tinta); font-weight: 600; }
+
+    .franja {
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--azul), var(--principal));
+    }
+
+    /* ---------- Buscador ---------- */
+    .buscador {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--suave);
+      border: 1px solid var(--linea);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .buscador svg { flex-shrink: 0; color: var(--gris); }
+    .buscador input {
+      border: 0; outline: 0;
+      width: 100%;
+      background: transparent;
+      font: inherit; font-size: 15px;
+      color: var(--tinta);
+    }
+    .buscador:focus-within { border-color: var(--azul); }
+
+    .titulo {
+      margin: 0 0 -10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gris);
+    }
+
+    /* ---------- Tarjetas de módulos ---------- */
+    .modulos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .tarjeta {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 22px 20px 18px;
+      background: var(--papel);
+      border: 1px solid var(--linea);
+      border-radius: 6px;
+      color: inherit;
+      text-decoration: none;
+      overflow: hidden;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .tarjeta::before {
+      content: "";
+      position: absolute; inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--azul), var(--principal));
+    }
+    .tarjeta:hover, .tarjeta:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--azul);
+      box-shadow: 0 8px 20px rgba(20, 40, 70, .12);
+      outline: none;
+    }
+    .icono {
+      width: 46px; height: 46px;
+      border-radius: 8px;
+      display: grid; place-items: center;
+      background: var(--suave);
+      color: var(--principal);
+    }
+    .tarjeta h4 {
+      margin: 0;
+      font-family: var(--letra-titulo);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--tinta);
+    }
+    .tarjeta p { margin: 0; flex: 1; font-size: 13px; line-height: 1.45; color: var(--gris); }
+    .abrir {
+      align-self: flex-start;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      background: var(--principal);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .tarjeta:hover .abrir { background: var(--principal-oscuro); }
+
+    .vacio { display: none; text-align: center; color: var(--gris); padding: 24px 0; margin: 0; }
+
+    footer {
+      margin-top: 4px;
+      padding-top: 14px;
+      border-top: 1px solid var(--linea);
+      text-align: center;
+      font-size: 12px;
+      color: var(--gris);
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 16px 16px 32px; }
+      .hoja { padding: 24px 18px; }
+      .encabezado { grid-template-columns: 1fr; }
+      .documento { justify-items: start; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="hoja">
+
+  <header class="encabezado">
+    <div class="negocio">
+      <img src="/Facturacion/Imagen/Logo%20de%20impacto.png" alt="Optica Impacto Visual" class="logo">
+      <h1>Optica Impacto Visual</h1>
+      <h2>Nit: 1121207872-6 Regimen Simplificado</h2>
+      <p>Accesorios - Monturas - Lentes - Despacho de Fórmulas Carrera 19 C No 22 - 10 Sur Telefono 2722839 Celular 3122823660 Barrio Olaya Bogota DC</p>
+    </div>
+    <div class="documento">
+      <span class="etiqueta">Sistema de gestión</span>
+      <h3>Panel principal</h3>
+      <div class="reloj">
+        <strong id="hora">--:--</strong>
+        <span id="fecha"></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="franja"></div>
+
+  <label class="buscador">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" id="buscar" placeholder="Buscar módulo…" autocomplete="off" aria-label="Buscar módulo">
+  </label>
+
+  <p class="titulo">Módulos</p>
+
+  <div class="modulos" id="modulos">
+
+    <a class="tarjeta" href="/Facturacion/Facturacion.html" data-keywords="facturacion facturas ventas cobro pagos">
+      <div class="icono">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
+      </div>
+      <h4>Facturación</h4>
+      <p>Emisión y consulta de facturas, ventas y pagos de clientes.</p>
+      <span class="abrir">Ingresar &rarr;</span>
+    </a>
+
+    <a class="tarjeta" href="/Formulas/Formulas_clientes.html" data-keywords="formulas clientes prescripcion receta graduacion">
+      <div class="icono">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-1a6 6 0 0 1 6-6h2"/><circle cx="17.5" cy="17.5" r="3.5"/><path d="M17.5 16v3M16 17.5h3"/></svg>
+      </div>
+      <h4>Fórmulas de clientes</h4>
+      <p>Registro de fórmulas ópticas y datos de cada cliente.</p>
+      <span class="abrir">Ingresar &rarr;</span>
+    </a>
+
+    <a class="tarjeta" href="/Trasavilidad/trasavilidad.html" data-keywords="trazabilidad trasavilidad seguimiento pedidos laboratorio">
+      <div class="icono">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 6H15a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h7.5"/></svg>
+      </div>
+      <h4>Trazabilidad</h4>
+      <p>Seguimiento de pedidos y productos desde el ingreso hasta la entrega.</p>
+      <span class="abrir">Ingresar &rarr;</span>
+    </a>
+
+    <a class="tarjeta" href="/Accesorios/Acesorios.html" data-keywords="accesorios plaquetas tornillos panitos cordon cadenas venta">
+      <div class="icono">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M10 15h4"/><path d="M2.5 13 5 6h2"/><path d="M21.5 13 19 6h-2"/></svg>
+      </div>
+      <h4>Accesorios</h4>
+      <p>Venta de accesorios: plaquetas, tornillos, pañitos, cordones y más.</p>
+      <span class="abrir">Ingresar &rarr;</span>
+    </a>
+
+    <a class="tarjeta" href="/Invetarios/Inventarios.html" data-keywords="inventarios inventario monturas lentes stock productos">
+      <div class="icono">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+      </div>
+      <h4>Inventarios</h4>
+      <p>Control de existencias de monturas, lentes y demás productos.</p>
+      <span class="abrir">Ingresar &rarr;</span>
+    </a>
+
+  </div>
+
+  <p class="vacio" id="sinResultados">No se encontró ningún módulo con ese nombre.</p>
+
+  <footer>
+    © <span id="anio"></span> Optica Impacto Visual - NIT 1121207872-6 · Sistema de gestión
+  </footer>
+
+</main>
+
+<script>
+  // Reloj y fecha
+  function actualizarReloj() {
+    const ahora = new Date();
+    document.getElementById('hora').textContent =
+      ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+    const fecha = ahora.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('fecha').textContent = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 30000);
+  document.getElementById('anio').textContent = new Date().getFullYear();
+
+  // Buscador de módulos (ignora tildes y mayúsculas)
+  const normalizar = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const tarjetas = document.querySelectorAll('#modulos .tarjeta');
+  const vacio = document.getElementById('sinResultados');
+  const buscar = document.getElementById('buscar');
+
+  buscar.addEventListener('input', () => {
+    const q = normalizar(buscar.value.trim());
+    let visibles = 0;
+    tarjetas.forEach(t => {
+      const mostrar = normalizar(t.textContent + ' ' + t.dataset.keywords).includes(q);
+      t.style.display = mostrar ? '' : 'none';
+      if (mostrar) visibles++;
+    });
+    vacio.style.display = visibles ? 'none' : 'block';
+  });
+
+  // Enter en el buscador abre el primer módulo visible
+  buscar.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const primero = [...tarjetas].find(t => t.style.display !== 'none');
+    if (primero) window.location.href = primero.href;
+  });
+</script>
+</body>
+</html>

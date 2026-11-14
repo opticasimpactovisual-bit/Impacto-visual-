@@ -1,0 +1,8 @@
+# Librerías y archivos compilados (se descargan o se generan solos)
+node_modules/
+bin/
+obj/
+
+# Configuración local de cada computador
+.env
+.claude/

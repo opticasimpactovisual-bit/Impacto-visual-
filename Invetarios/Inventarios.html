@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Inventarios</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="Inventarios.css?v=3">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <a href="http://localhost:5001/" class="volver-inicio">&larr; Volver al inicio</a>
+        <img src="./Imagenes/Logo%20de%20impacto.png" alt="Logo de Optica Impacto visual" width="200" height="100">
+        <h1>Optica Impacto visual</h1>
+        <h2>NIT 1121207872-6</h2>
+
+        <h1>Inventarios</h1>
+        <p>Bienvenido al inventario de la Optica impacto visual, aqui podras encontrar todos los productos que tenemos disponibles para la venta, asi como tambien podras ver el stock de cada uno de ellos.</p>
+
+        <label for="ubicacion">Ubicacion del producto
+        <input type="text" id="ubicacion" placeholder="Ubicación del producto">
+        </label>
+        <label for="Referencia">Referencia
+        <input type="text" id="Referencia" placeholder="Referencia">
+        </label>
+        <label for="FechaIngreso">Fecha de ingreso
+        <input type="date" id="FechaIngreso" title="Fecha_ingreso" placeholder="Fecha de ingreso del producto">
+        </label>
+        <label for="cantidad">Cantidad
+        <input type="number" id="cantidad" placeholder="Cantidad del producto">
+        </label>
+        <label for="ValorCosto">Valor unitario del producto
+        <input type="text" id="ValorCosto" placeholder="Valor unitario del producto">
+        </label>
+        <label for="ValorCliente">Valor total de producto
+        <input type="text" id="ValorCliente" placeholder="Valor total del producto">
+        </label>
+        <label for="listaMaterial">Material
+        <input list="listaMaterial" id="Material" placeholder="Material del producto">
+        <datalist id="listaMaterial">
+            <option value="Plástico"></option>
+            <option value="Plastico al aire"></option>
+            <option value="Acetato"></option>
+            <option value="Acetato al aire"></option>
+            <option value="metalica al aire"></option>
+            <option value="TR 90 al aire"></option>
+            <option value="TR 90 con sobre puesto"></option>
+            <option value="Deportiva"></option>
+            <option value="TR 90"></option>
+            <option value="Metalica"></option>
+            <option value="Seguridad con banda"></option>
+        </datalist>
+        </label>
+        <label for="listaForma">Forma del producto
+        <input list="listaForma" id="Forma" placeholder="Forma del producto">
+        <datalist id="listaForma">
+            <option value="Redonda"></option>
+            <option value="Cuadrada"></option>
+            <option value="Rectangular"></option>
+            <option value="Agatada"></option>
+            <option value="Ovalada"></option>
+        </datalist>
+        </label>
+        <label for="listaEstadoMontura">Estado de la montura
+        <input list="listaEstadoMontura" id="EstadoMontura" placeholder="Estado de la montura">
+        <datalist id="listaEstadoMontura">
+            <option value="Nueva"></option>
+            <option value="Usada"></option>
+        </datalist>
+        </label>
+        <label for="Marca">Marca del prducto
+        <input type="text" id="Marca" placeholder="Marca del producto">
+        </label>    
+        <label for="listaEsReplic">Replica
+        <input list="listaEsReplica" id="EsReplica" placeholder="Es replica">
+        <datalist id="listaEsReplica">
+            <option value="Si"></option>
+            <option value="No"></option>
+        </datalist>
+        </label>
+        <label for="NombreReplica">Marca de la replicar
+        <input type="text" id="NombreReplica" placeholder="Marca de la replica">
+        </label>
+        <label for="Color">Color
+        <input type="text" id="Color" placeholder="Color del producto">
+        </label>
+        
+        
+
+        <div class="botones">
+            <button id="agregar">Agregar producto</button>
+            <button id="cancelar" class="btn-secundario" hidden>Cancelar edición</button>
+        </div>
+        <p id="mensaje" class="mensaje" role="status"></p>
+
+        <h1>Monturas registradas</h1>
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Referencia</th>
+                        <th>Marca</th>
+                        <th>Material</th>
+                        <th>Forma</th>
+                        <th>Color</th>
+                        <th>Estado</th>
+                        <th>Cantidad</th>
+                        <th>Costo</th>
+                        <th>Cliente</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMonturas"></tbody>
+            </table>
+        </div>
+
+        <script src="Inventarios.js?v=3" defer></script>
+    </body>
+</html>
