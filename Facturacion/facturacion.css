@@ -391,3 +391,22 @@ button:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
 }
 .volver-inicio:hover { text-decoration: underline; }
 @media print { .volver-inicio { display: none !important; } }
+
+/* ---------- RX (fórmula) que se agrega al usar "Imprimir con RX" ---------- */
+.rx-impresion { display: grid; gap: 10px; padding-top: 14px; border-top: 2px solid var(--tinta); }
+.rx-formula { display: grid; gap: 8px; break-inside: avoid; }
+.rx-formula + .rx-formula { padding-top: 10px; border-top: 1px solid var(--linea); }
+.rx-datos { display: flex; flex-wrap: wrap; gap: 4px 28px; font-size: 13px; }
+.rx-tabla { border-collapse: collapse; width: 100%; font-size: 13px; }
+.rx-tabla th, .rx-tabla td { border: 1px solid var(--linea); padding: 6px 10px; text-align: center; }
+.rx-tabla tr:first-child th {
+    background: var(--verde-suave);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gris);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.rx-tabla th { font-weight: 600; width: 1%; white-space: nowrap; }
+.rx-numero { font-family: var(--letra-numeros); font-variant-numeric: tabular-nums; }

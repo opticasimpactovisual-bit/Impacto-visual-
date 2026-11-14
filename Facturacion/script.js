@@ -322,3 +322,114 @@
 
             productos.appendChild(nuevo);
         });
+
+
+        // ---------- Imprimir con RX ----------
+        // Busca la fórmula (RX) guardada para el número de factura, la pone al final
+        // de la hoja solo para imprimir, abre la impresión y después la quita.
+        const botonImprimirRx = document.getElementById("imprimirRx");
+        if (botonImprimirRx) botonImprimirRx.addEventListener("click", imprimirConRx);
+
+        function textoCelda(etiqueta, texto, clase) {
+            const el = document.createElement(etiqueta);
+            el.textContent = texto == null || texto === "" ? "—" : texto;
+            if (clase) el.className = clase;
+            return el;
+        }
+
+        function armarRx(formulas) {
+            const bloque = document.createElement("section");
+            bloque.id = "rxImpresion";
+            bloque.className = "rx-impresion";
+
+            const titulo = document.createElement("p");
+            titulo.className = "titulo";
+            titulo.textContent = "RX - Fórmula óptica";
+            bloque.appendChild(titulo);
+
+            formulas.forEach(function (fo) {
+                const tarjeta = document.createElement("div");
+                tarjeta.className = "rx-formula";
+
+                const datos = document.createElement("div");
+                datos.className = "rx-datos";
+                datos.append(
+                    textoCelda("span", "Paciente: " + (fo.nombre_cliente || "—")),
+                    textoCelda("span", "Doctor: " + (fo.doctor || "—"))
+                );
+                tarjeta.appendChild(datos);
+
+                const tabla = document.createElement("table");
+                tabla.className = "rx-tabla";
+                const encabezado = document.createElement("tr");
+                ["", "Fórmula", "ADD", "DP", "Altura"].forEach(function (t) {
+                    encabezado.appendChild(textoCelda("th", t || " "));
+                });
+                tabla.appendChild(encabezado);
+
+                [["OD", fo.ojo_derecho], ["OI", fo.ojo_izquierdo]].forEach(function (ojo, i) {
+                    const fila = document.createElement("tr");
+                    fila.append(
+                        textoCelda("th", ojo[0]),
+                        textoCelda("td", ojo[1], "rx-numero")
+                    );
+                    // ADD, distancia y altura se escriben una sola vez para los dos ojos
+                    if (i === 0) {
+                        [fo.adicion, fo.distancia, fo.altura].forEach(function (valor) {
+                            const td = textoCelda("td", valor, "rx-numero");
+                            td.rowSpan = 2;
+                            fila.appendChild(td);
+                        });
+                    }
+                    tabla.appendChild(fila);
+                });
+                tarjeta.appendChild(tabla);
+
+                const lente = document.createElement("div");
+                lente.className = "rx-datos";
+                lente.append(
+                    textoCelda("span", "Lente: " + (fo.tipo_lente || "—")),
+                    textoCelda("span", "Montura: " + (fo.tipo_montura || "—"))
+                );
+                tarjeta.appendChild(lente);
+                bloque.appendChild(tarjeta);
+            });
+            return bloque;
+        }
+
+        async function imprimirConRx() {
+            const numero = document.getElementById("N_Factura").value.trim();
+            if (!numero) {
+                alert("Escriba o busque el número de la factura para traer su fórmula (RX).");
+                return;
+            }
+
+            let datos;
+            try {
+                const respuesta = await fetch("/api/formulas/factura?numero=" + encodeURIComponent(numero));
+                datos = await respuesta.json();
+                if (!respuesta.ok) {
+                    alert((datos && datos.mensaje) || "No se encontró la factura " + numero + ".");
+                    return;
+                }
+            } catch (error) {
+                alert("No hay conexión con el servidor. Inicie el servidor y abra la página en http://localhost:5001");
+                return;
+            }
+
+            const formulas = datos.formulas || [];
+            if (formulas.length === 0) {
+                const seguir = confirm("La factura " + numero + " no tiene fórmula (RX) guardada.\n" +
+                    "Guárdela en la página Fórmulas de clientes.\n\n¿Desea imprimir la factura sin RX?");
+                if (seguir) window.print();
+                return;
+            }
+
+            const anterior = document.getElementById("rxImpresion");
+            if (anterior) anterior.remove();
+            const rx = armarRx(formulas);
+            document.querySelector(".pie").before(rx);
+
+            window.addEventListener("afterprint", function () { rx.remove(); }, { once: true });
+            window.print();
+        }
