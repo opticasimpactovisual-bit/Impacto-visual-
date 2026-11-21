@@ -29,3 +29,10 @@ BEGIN
     CREATE INDEX IX_Accesorios_Tipo ON dbo.Accesorios (TipoProducto);
 END
 GO
+
+-- Une cada accesorio vendido con su factura (página Acesorios.html).
+-- Si se elimina la factura, se eliminan también sus accesorios.
+IF COL_LENGTH(N'dbo.Accesorios', N'IdFactura') IS NULL
+    ALTER TABLE dbo.Accesorios ADD IdFactura INT NULL
+        CONSTRAINT FK_Accesorios_Facturas FOREIGN KEY REFERENCES dbo.facturas (id_factura) ON DELETE CASCADE;
+GO

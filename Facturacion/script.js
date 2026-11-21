@@ -1,6 +1,8 @@
         const total = document.getElementById("Total");
         const abono = document.getElementById("Abono");
         const saldo = document.getElementById("Saldo");
+        // Sección de accesorios: solo existe en la página Acesorios.html (null en Facturación)
+        const listaAccesorios = document.getElementById("accesorios");
 
         // Convierte "1.500.000" en el número 1500000
         function leerPesos(campo) {
@@ -66,7 +68,15 @@
                 fechaEntrega: valor("FechaEntrega"),
                 horaEntrega: valor("HoraEntrega"),
                 detalleEntrega: valor("Detalle"),
-                vendedor: valor("Vendedor")
+                vendedor: valor("Vendedor"),
+                // Solo la página de Accesorios tiene esta sección; se guarda en la tabla dbo.Accesorios
+                accesorios: listaAccesorios ? Array.from(listaAccesorios.querySelectorAll(".accesorio")).map(function (fila) {
+                    return {
+                        tipoProducto: fila.querySelector("select").value || null,
+                        referencia: fila.querySelector("[id^='AccReferencia']").value.trim() || null,
+                        cantidad: Number(fila.querySelector("[id^='AccCantidad']").value) || null
+                    };
+                }) : undefined
             };
 
             try {
@@ -100,6 +110,13 @@
                 if (indice > 0) grupo.remove();
             });
             contadorProductos = 1;
+
+            // Igual con los accesorios: queda solo la primera fila
+            if (listaAccesorios) {
+                listaAccesorios.querySelectorAll(".accesorio").forEach(function (fila, indice) {
+                    if (indice > 0) fila.remove();
+                });
+            }
 
             document.querySelectorAll("input, textarea").forEach(function (campo) {
                 campo.value = "";
@@ -270,6 +287,21 @@
                 grupo.querySelector("textarea").value = p.tipo_lente || "";
             });
 
+            // Una fila de accesorio por cada accesorio guardado
+            if (listaAccesorios) {
+                const accesorios = f.accesorios || [];
+                for (let i = 1; i < accesorios.length; i++) {
+                    document.getElementById("agregarAccesorio").click();
+                }
+                listaAccesorios.querySelectorAll(".accesorio").forEach(function (fila, i) {
+                    const a = accesorios[i];
+                    if (!a) return;
+                    elegir(fila.querySelector("select"), a.TipoProducto);
+                    fila.querySelector("[id^='AccReferencia']").value = a.Referencia || "";
+                    fila.querySelector("[id^='AccCantidad']").value = a.Cantidad || "";
+                });
+            }
+
             document.getElementById("FechaEntrega").value = soloFecha(f.fecha_entrega);
             document.getElementById("HoraEntrega").value = f.hora_entrega ? f.hora_entrega.substring(0, 5) : "";
             document.getElementById("Detalle").value = f.detalle_entrega || "";
@@ -322,6 +354,36 @@
 
             productos.appendChild(nuevo);
         });
+
+
+        // ---------- Accesorios (solo en la página Acesorios.html) ----------
+        // "Agregar accesorio" copia la primera fila con los campos vacíos
+        let contadorAccesorios = 1;
+
+        if (listaAccesorios) {
+            document.getElementById("agregarAccesorio").addEventListener("click", function () {
+                contadorAccesorios++;
+                const nueva = listaAccesorios.querySelector(".accesorio").cloneNode(true);
+
+                nueva.querySelectorAll("input, select").forEach(function (campo) {
+                    campo.id = campo.id.split("_")[0] + "_" + contadorAccesorios;
+                    campo.name = campo.id;
+                    campo.value = "";
+                    if (campo.tagName === "SELECT") campo.selectedIndex = 0;
+                });
+                nueva.querySelectorAll("label").forEach(function (etiqueta) {
+                    etiqueta.htmlFor = etiqueta.htmlFor.split("_")[0] + "_" + contadorAccesorios;
+                });
+
+                const quitar = nueva.querySelector(".quitar");
+                quitar.hidden = false;
+                quitar.addEventListener("click", function () {
+                    nueva.remove();
+                });
+
+                listaAccesorios.appendChild(nueva);
+            });
+        }
 
 
         // ---------- Imprimir con RX ----------
