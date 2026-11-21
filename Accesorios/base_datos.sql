@@ -36,3 +36,15 @@ IF COL_LENGTH(N'dbo.Accesorios', N'IdFactura') IS NULL
     ALTER TABLE dbo.Accesorios ADD IdFactura INT NULL
         CONSTRAINT FK_Accesorios_Facturas FOREIGN KEY REFERENCES dbo.facturas (id_factura) ON DELETE CASCADE;
 GO
+
+-- Las monturas vendidas en la página Acesorios.html también se guardan aquí, con tipo "Montura"
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = N'CK_Accesorios_Tipo' AND definition NOT LIKE N'%Montura%')
+BEGIN
+    ALTER TABLE dbo.Accesorios DROP CONSTRAINT CK_Accesorios_Tipo;
+    ALTER TABLE dbo.Accesorios ADD CONSTRAINT CK_Accesorios_Tipo CHECK (TipoProducto IN (
+        N'Montura', N'Estuche', N'Plaquetas', N'Tornillos', N'Pañitos', N'Líquido antiempañante',
+        N'Terminales', N'Cordón', N'Cadenas', N'Colas de ratón',
+        N'Reparación', N'Otros'));
+END
+GO

@@ -142,29 +142,52 @@ async Task<IResult> GuardarFactura(FacturaDto f, int? idExistente)
             await cmdProducto.ExecuteNonQueryAsync();
         }
 
-        // Accesorios (página Acesorios.html): una fila en dbo.Accesorios por cada accesorio.
-        // Al editar, los accesorios anteriores de la factura se reemplazan por los del formulario.
-        // La página de Facturación no envía accesorios (null), así que no los toca.
-        if (idExistente is not null && f.Accesorios is not null)
+        // Página Acesorios.html: lo vendido también queda en dbo.Accesorios, unido a la factura por IdFactura.
+        //   - cada accesorio (Plaquetas, Tornillos, ...) con su referencia y cantidad
+        //   - cada montura de la sección de productos, con tipo "Montura"
+        // Al editar, las filas anteriores de la factura se reemplazan por las del formulario.
+        // La página de Facturación no envía accesorios (null), así que ahí no se toca dbo.Accesorios.
+        if (f.Accesorios is not null)
         {
-            var borrarAcc = new SqlCommand("DELETE FROM dbo.Accesorios WHERE IdFactura = @id;", cn, tx);
-            borrarAcc.Parameters.AddWithValue("@id", idFactura);
-            await borrarAcc.ExecuteNonQueryAsync();
-        }
-        foreach (var a in f.Accesorios ?? [])
-        {
-            if (string.IsNullOrWhiteSpace(a.TipoProducto)) continue; // fila sin tipo: no se guarda
-            var cmdAcc = new SqlCommand(@"
-                INSERT INTO dbo.Accesorios (IdFactura, TipoProducto, Referencia, Cantidad, FechaIngreso, Observaciones)
-                VALUES (@factura, @tipo, @referencia, @cantidad, COALESCE(@fecha, CAST(GETDATE() AS DATE)), @obs);", cn, tx);
-            cmdAcc.Parameters.AddWithValue("@factura", idFactura);
-            cmdAcc.Parameters.AddWithValue("@tipo", a.TipoProducto.Trim());
-            cmdAcc.Parameters.AddWithValue("@referencia", Valor(a.Referencia));
-            cmdAcc.Parameters.AddWithValue("@cantidad", a.Cantidad is > 0 ? a.Cantidad.Value : 1);
-            cmdAcc.Parameters.AddWithValue("@fecha", (object?)f.FechaVenta ?? DBNull.Value);
-            cmdAcc.Parameters.AddWithValue("@obs", string.IsNullOrWhiteSpace(f.NumeroFactura)
-                ? DBNull.Value : "Factura No. " + f.NumeroFactura.Trim());
-            await cmdAcc.ExecuteNonQueryAsync();
+            if (idExistente is not null)
+            {
+                var borrarAcc = new SqlCommand("DELETE FROM dbo.Accesorios WHERE IdFactura = @id;", cn, tx);
+                borrarAcc.Parameters.AddWithValue("@id", idFactura);
+                await borrarAcc.ExecuteNonQueryAsync();
+            }
+
+            var factura = string.IsNullOrWhiteSpace(f.NumeroFactura) ? null : "Factura No. " + f.NumeroFactura.Trim();
+            var filas = new List<(string Tipo, string? Referencia, int Cantidad, string? Obs)>();
+
+            foreach (var a in f.Accesorios)
+            {
+                if (string.IsNullOrWhiteSpace(a.TipoProducto)) continue; // fila sin tipo: no se guarda
+                filas.Add((a.TipoProducto.Trim(), a.Referencia, a.Cantidad is > 0 ? a.Cantidad.Value : 1, factura));
+            }
+
+            foreach (var p in f.Productos ?? [])
+            {
+                if (new[] { p.TipoMontura, p.Color, p.Referencia, p.TipoLente }.All(string.IsNullOrWhiteSpace)) continue;
+                // Observaciones: "Factura No. 2351 · Metalica · Completa · Lente: ..."
+                var detalle = new[] { factura, p.TipoMontura?.Trim(), p.Color?.Trim(),
+                                      string.IsNullOrWhiteSpace(p.TipoLente) ? null : "Lente: " + p.TipoLente.Trim() }
+                    .Where(t => !string.IsNullOrWhiteSpace(t));
+                filas.Add(("Montura", p.Referencia, 1, string.Join(" · ", detalle)));
+            }
+
+            foreach (var fila in filas)
+            {
+                var cmdAcc = new SqlCommand(@"
+                    INSERT INTO dbo.Accesorios (IdFactura, TipoProducto, Referencia, Cantidad, FechaIngreso, Observaciones)
+                    VALUES (@factura, @tipo, @referencia, @cantidad, COALESCE(@fecha, CAST(GETDATE() AS DATE)), @obs);", cn, tx);
+                cmdAcc.Parameters.AddWithValue("@factura", idFactura);
+                cmdAcc.Parameters.AddWithValue("@tipo", fila.Tipo);
+                cmdAcc.Parameters.AddWithValue("@referencia", Valor(Recortar(fila.Referencia, 60)));
+                cmdAcc.Parameters.AddWithValue("@cantidad", fila.Cantidad);
+                cmdAcc.Parameters.AddWithValue("@fecha", (object?)f.FechaVenta ?? DBNull.Value);
+                cmdAcc.Parameters.AddWithValue("@obs", Valor(Recortar(fila.Obs, 255)));
+                await cmdAcc.ExecuteNonQueryAsync();
+            }
         }
 
         await tx.CommitAsync();
@@ -244,7 +267,8 @@ app.MapGet("/api/facturas/{id:int}", async (int id) =>
     factura["productos"] = await LeerFilas(cmdProductos);
 
     var cmdAccesorios = new SqlCommand(
-        "SELECT * FROM dbo.Accesorios WHERE IdFactura = @id ORDER BY IdAccesorio;", cn);
+        // Las monturas ya vienen en "productos": aquí solo los accesorios
+        "SELECT * FROM dbo.Accesorios WHERE IdFactura = @id AND TipoProducto <> N'Montura' ORDER BY IdAccesorio;", cn);
     cmdAccesorios.Parameters.AddWithValue("@id", id);
     factura["accesorios"] = await LeerFilas(cmdAccesorios);
 
@@ -464,8 +488,10 @@ async Task<IResult> GuardarTrazabilidad(TrazabilidadDto t, int? idExistente)
 app.Run();
 
 
-// Agrega a dbo.Accesorios la columna IdFactura (si aún no la tiene) para unir cada
-// accesorio con su factura. No borra datos. Es lo mismo que hace Accesorios/base_datos.sql.
+// Prepara dbo.Accesorios para las ventas de la página Acesorios.html. No borra datos.
+// Es lo mismo que hace Accesorios/base_datos.sql:
+//   - agrega la columna IdFactura (si aún no la tiene) para unir cada fila con su factura
+//   - acepta el tipo "Montura" para las monturas vendidas (y "Estuche")
 async Task PrepararTablaAccesorios()
 {
     try
@@ -476,7 +502,18 @@ async Task PrepararTablaAccesorios()
             IF OBJECT_ID(N'dbo.Accesorios', N'U') IS NOT NULL
                AND COL_LENGTH(N'dbo.Accesorios', N'IdFactura') IS NULL
                 ALTER TABLE dbo.Accesorios ADD IdFactura INT NULL
-                    CONSTRAINT FK_Accesorios_Facturas FOREIGN KEY REFERENCES dbo.facturas (id_factura) ON DELETE CASCADE;", cn);
+                    CONSTRAINT FK_Accesorios_Facturas FOREIGN KEY REFERENCES dbo.facturas (id_factura) ON DELETE CASCADE;
+
+            IF EXISTS (SELECT 1 FROM sys.check_constraints
+                       WHERE name = N'CK_Accesorios_Tipo' AND parent_object_id = OBJECT_ID(N'dbo.Accesorios')
+                         AND definition NOT LIKE N'%Montura%')
+            BEGIN
+                ALTER TABLE dbo.Accesorios DROP CONSTRAINT CK_Accesorios_Tipo;
+                ALTER TABLE dbo.Accesorios ADD CONSTRAINT CK_Accesorios_Tipo CHECK (TipoProducto IN (
+                    N'Montura', N'Estuche', N'Plaquetas', N'Tornillos', N'Pañitos', N'Líquido antiempañante',
+                    N'Terminales', N'Cordón', N'Cadenas', N'Colas de ratón',
+                    N'Reparación', N'Otros'));
+            END", cn);
         await cmd.ExecuteNonQueryAsync();
     }
     catch (SqlException ex)
@@ -491,6 +528,10 @@ async Task PrepararTablaAccesorios()
 // Los campos vacíos se guardan como NULL
 static object Valor(string? texto) =>
     string.IsNullOrWhiteSpace(texto) ? DBNull.Value : texto.Trim();
+
+// Corta un texto al largo máximo de la columna
+static string? Recortar(string? texto, int largo) =>
+    texto is null ? null : texto.Trim().Length <= largo ? texto.Trim() : texto.Trim()[..largo];
 
 // Busca el cliente por tipo y número de documento; si no existe lo crea.
 // Si el formulario no trae ningún dato del cliente, la factura queda sin cliente.
