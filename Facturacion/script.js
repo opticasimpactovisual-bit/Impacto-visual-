@@ -3,6 +3,11 @@
         const saldo = document.getElementById("Saldo");
         // Sección de accesorios: solo existe en la página Acesorios.html (null en Facturación)
         const listaAccesorios = document.getElementById("accesorios");
+        // Dirección del servidor donde guarda esta página. Accesorios usa la suya
+        // (<body data-api="/api/ventas-accesorios">) para guardar en sus propias tablas,
+        // y data-rx para buscar la fórmula (RX) de la venta de accesorios al imprimir.
+        const API = document.body.dataset.api || "/api/facturas";
+        const RX = document.body.dataset.rx || "/api/formulas/factura";
 
         // Convierte "1.500.000" en el número 1500000
         function leerPesos(campo) {
@@ -69,7 +74,7 @@
                 horaEntrega: valor("HoraEntrega"),
                 detalleEntrega: valor("Detalle"),
                 vendedor: valor("Vendedor"),
-                // Solo la página de Accesorios tiene esta sección; se guarda en la tabla dbo.Accesorios
+                // Solo la página de Accesorios tiene esta sección; se guarda en la tabla dbo.venta_accesorios_detalle
                 accesorios: listaAccesorios ? Array.from(listaAccesorios.querySelectorAll(".accesorio")).map(function (fila) {
                     return {
                         tipoProducto: fila.querySelector("select").value || null,
@@ -81,7 +86,7 @@
 
             try {
                 const editando = idFacturaEditando !== null;
-                const respuesta = await fetch(editando ? "/api/facturas/" + idFacturaEditando : "/api/facturas", {
+                const respuesta = await fetch(editando ? API + "/" + idFacturaEditando : API, {
                     method: editando ? "PUT" : "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(factura)
@@ -167,7 +172,7 @@
 
             let lista;
             try {
-                const respuesta = await fetch("/api/facturas/buscar?texto=" + encodeURIComponent(texto));
+                const respuesta = await fetch(API + "/buscar?texto=" + encodeURIComponent(texto));
                 lista = await respuesta.json();
             } catch (error) {
                 alert("No hay conexión con el servidor. Inicie el servidor y abra la página en http://localhost:5001");
@@ -224,7 +229,7 @@
             }
 
             try {
-                const respuesta = await fetch("/api/facturas/" + f.id_factura, { method: "DELETE" });
+                const respuesta = await fetch(API + "/" + f.id_factura, { method: "DELETE" });
                 const datos = await respuesta.json();
                 if (!respuesta.ok) {
                     alert("No se eliminó la factura. " + datos.mensaje);
@@ -247,7 +252,7 @@
         async function cargarFactura(id) {
             let f;
             try {
-                const respuesta = await fetch("/api/facturas/" + id);
+                const respuesta = await fetch(API + "/" + id);
                 f = await respuesta.json();
                 if (!respuesta.ok) {
                     alert(f.mensaje);
@@ -296,9 +301,9 @@
                 listaAccesorios.querySelectorAll(".accesorio").forEach(function (fila, i) {
                     const a = accesorios[i];
                     if (!a) return;
-                    elegir(fila.querySelector("select"), a.TipoProducto);
-                    fila.querySelector("[id^='AccReferencia']").value = a.Referencia || "";
-                    fila.querySelector("[id^='AccCantidad']").value = a.Cantidad || "";
+                    elegir(fila.querySelector("select"), a.tipo_producto);
+                    fila.querySelector("[id^='AccReferencia']").value = a.referencia || "";
+                    fila.querySelector("[id^='AccCantidad']").value = a.cantidad || "";
                 });
             }
 
@@ -468,7 +473,7 @@
 
             let datos;
             try {
-                const respuesta = await fetch("/api/formulas/factura?numero=" + encodeURIComponent(numero));
+                const respuesta = await fetch(RX + "?numero=" + encodeURIComponent(numero));
                 datos = await respuesta.json();
                 if (!respuesta.ok) {
                     alert((datos && datos.mensaje) || "No se encontró la factura " + numero + ".");
